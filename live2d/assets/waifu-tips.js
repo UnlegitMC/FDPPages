@@ -217,13 +217,33 @@ function initModel(waifuPath, type) {
     } loadModel(modelId);
 }
 
-function loadModel(modelUrl) {
+function loadModel(modelId) {
     if (live2d_settings.modelStorage) {
         localStorage.setItem('modelId', modelId);
     } else {
         sessionStorage.setItem('modelId', modelId);
     }
-    loadlive2d('live2d', live2d_settings["baseUrl"] + modelUrl, (live2d_settings.showF12Status ? console.log('[Status]','live2d','模型',modelUrl,'加载完成'):null));
+    loadlive2d('live2d', live2d_settings["baseUrl"] + modelId, (live2d_settings.showF12Status ? console.log('[Status]','live2d','模型',modelId,'加载完成'):null));
+}
+    
+function loadOtherModel() {
+    var modelId = modelStorageGetItem('modelId');
+
+    loadModel(pickRandomly(live2d_settings['models'], modelId));
+}
+
+function modelStorageGetItem(key) { return live2d_settings.modelStorage ? localStorage.getItem(key) : sessionStorage.getItem(key); }
+
+function pickRandomly(array, nowValue) {
+    if(array.length < 2) {
+        return array[0]
+    }
+    var value = array[Math.floor(Math.random() * array.length)]
+    if(value == nowValue) {
+        return pickRandomly(array, nowValue)
+    } else {
+        return value
+    }
 }
 
 function loadTipsMessage(result) {
@@ -318,26 +338,6 @@ function loadTipsMessage(result) {
     }; if (live2d_settings.showWelcomeMessage) showWelcomeMessage(result);
     
     var waifu_tips = result.waifu;
-    
-    function loadOtherModel() {
-        var modelId = modelStorageGetItem('modelId');
-
-        loadModel(pickRandomly(live2d_settings['models'], modelId));
-    }
-
-    function pickRandomly(array, nowValue) {
-        if(array.length < 2) {
-            return array[0]
-        }
-        var value = array[Math.floor(Math.random() * array.length)]
-        if(value == nowValue) {
-            return pickRandomly(array, nowValue)
-        } else {
-            return value
-        }
-    }
-    
-    function modelStorageGetItem(key) { return live2d_settings.modelStorage ? localStorage.getItem(key) : sessionStorage.getItem(key); }
     
     /* 检测用户活动状态，并在空闲时显示一言 */
     if (live2d_settings.showHitokoto) {
